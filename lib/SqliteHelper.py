@@ -97,3 +97,11 @@ class SqliteHelper:
     def get_consumer_by_id(self, customer_id):
         with sqlite3.connect(self.db_name) as db:
             return db.execute("SELECT * FROM Consumer WHERE ID=?", customer_id).fetchall()
+
+    def get_all_companies(self):
+        with sqlite3.connect(self.db_name) as db:
+            return db.execute("SELECT * FROM Company").fetchall()
+
+    def get_all_consumers(self):
+        with sqlite3.connect(self.db_name) as db:
+            return db.execute("SELECT * FROM Customer WHERE type=?", ("Consumer",)).fetchall()

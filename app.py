@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 import base64
+import json
 
 from lib.SqliteHelper import SqliteHelper
 
@@ -22,7 +23,7 @@ def login():
         password = base64.b64decode(authentication_header[delimiter:]).decode("utf-8")
 
         if sqliteHelper.verify_user(username, password):
-            return jsonify({"result": "true"})
+            return jsonify({"status": "success", "result": "true"})
 
     return jsonify({"result": "false"})
 
@@ -30,8 +31,8 @@ def login():
 @app.route("/customer/customer_ids/<customer_id>", methods=["get"])
 def get_customer_ids(customer_id):
     if is_authenticated():
-        xd = sqliteHelper.get_customer_associated_ids(customer_id)
-        print(xd)
+        get_customer_ass_ids = sqliteHelper.get_customer_associated_ids(customer_id)
+        return jsonify({"status": "success", "result": get_customer_ass_ids})
     return jsonify({"status": "error"})
 
 
@@ -39,7 +40,7 @@ def get_customer_ids(customer_id):
 def get_address(address_id):
     if is_authenticated():
         test = sqliteHelper.get_address_by_id(address_id)
-        return jsonify({"status": "success"}, test)
+        return jsonify({"status": "success", "result": test})
     return jsonify({"status": "error"})
 
 
@@ -47,15 +48,33 @@ def get_address(address_id):
 def get_company(company_id):
     if is_authenticated():
         get_company = sqliteHelper.get_company_by_id(company_id)
-        return jsonify({"status": "success"}, get_company)
+        return jsonify({"status": "success", "result": get_company})
+
     return jsonify({"status": "error"})
+
 
 @app.route("/customer/consumer/<customer_id>")
 def get_consumer(customer_id):
     if is_authenticated():
         get_company = sqliteHelper.get_consumer_by_id(customer_id)
-        return jsonify({"status": "success"}, get_company)
+        return jsonify({"status": "success", "result": get_company})
+
     return jsonify({"status": "error"})
+
+
+@app.route("/customer/company/get_all", methods=["get"])
+def get_all_companies():
+    if is_authenticated():
+        get_companies = sqliteHelper.get_all_companies()
+        print(get_companies[0])
+        return jsonify({"status": "success", "result": get_companies})
+
+@app.route("/customer/consumer/get_all", methods=["get"])
+def get_all_consumers():
+    if is_authenticated():
+        get_consumers = sqliteHelper.get_all_consumers()
+        print(get_consumers)
+        return jsonify({"status": "success", "result": get_consumers})
 
 def is_authenticated():
     api_key = open("api_key", "r").read()
