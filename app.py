@@ -25,7 +25,7 @@ def login():
         if sqliteHelper.verify_user(username, password):
             return jsonify({"status": "success", "result": "true"})
 
-    return jsonify({"result": "false"})
+    return jsonify({"status": "success", "result": "false"})
 
 
 @app.route("/customer/customer_ids/<customer_id>", methods=["get"])
@@ -69,12 +69,14 @@ def get_all_companies():
         print(get_companies[0])
         return jsonify({"status": "success", "result": get_companies})
 
+
 @app.route("/customer/consumer/get_all", methods=["get"])
 def get_all_consumers():
     if is_authenticated():
         get_consumers = sqliteHelper.get_all_consumers()
         print(get_consumers)
         return jsonify({"status": "success", "result": get_consumers})
+
 
 def is_authenticated():
     api_key = open("api_key", "r").read()
