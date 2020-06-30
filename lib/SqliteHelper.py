@@ -20,7 +20,8 @@ class SqliteHelper:
                 "name varchar not null, "
                 "email_address varchar not null, "
                 "telephone_number varchar not null, "
-                "type varchar not null"
+                "address_id integer not null,"
+                "foreign key (address_id) references Address(ID)"
                 ")")
 
             db.execute(
@@ -43,19 +44,9 @@ class SqliteHelper:
                 "create table if not exists Company (ID integer primary key autoincrement, "
                 "name varchar not null, "
                 "kvk_number varchar not null, "
-                "contact_person varchar not null"
-                ")")
-            db.execute(
-                "create table if not exists Customer_Data ("
-                "ID integer primary key autoincrement, "
-                "customer_id integer, "
-                "address_id integer, "
-                "company_id integer, "
-                "consumer_id integer,"
-                "foreign key (customer_id) references Customer(ID),"
-                "foreign key (address_id) references Address(ID),"
-                "foreign key (company_id) references Company(ID),"
-                "foreign key (consumer_id) references Consumer(ID)"
+                "contact_person varchar not null, "
+                "address_id integer not null,"
+                "foreign key (address_id) references Address(ID)"
                 ")")
             db.commit()
 
@@ -104,4 +95,53 @@ class SqliteHelper:
 
     def get_all_consumers(self):
         with sqlite3.connect(self.db_name) as db:
-            return db.execute("SELECT * FROM Customer WHERE type=?", ("Consumer",)).fetchall()
+            return db.execute("SELECT * FROM Customer").fetchall()
+
+    def get_address_from_id(self, id):
+        with sqlite3.connect(self.db_name) as db:
+            return db.execute("SELECT * FROM Address WHERE ID=?", (id,)).fetchall()
+
+    def add_new_company(self):
+        pass
+
+    def add_new_consumer(self):
+        with sqlite3.connect(self.db_name) as db:
+            pass
+
+    def create_update(self, to_update):
+        tables = ""
+
+        # Bit hacky but i need to skip the first one since i wont update ID.
+        i = 0
+        iter_to_update = iter(to_update.items())
+        next(iter_to_update)
+        for x in iter_to_update:
+            i += 1
+            tables += str(x[0]) + " = \"" + str(x[1]) + "\""
+            if i != len(to_update) - 1:
+                tables += ", "
+
+        return tables
+
+    def update_consumer(self, to_update):
+        with sqlite3.connect(self.db_name) as db:
+            # tables = ""
+            #
+            # # Bit hacky but i need to skip the first one since i wont update ID.
+            # i = 0
+            # iter_to_update = iter(to_update.items())
+            # next(iter_to_update)
+            # for x in iter_to_update:
+            #     i += 1
+            #     tables += str(x[0]) + " = \"" + str(x[1]) + "\""
+            #     if i != len(to_update) - 1:
+            #         tables += ", "
+            #
+            # print(tables)
+            db.execute("UPDATE Customer SET " + self.create_update(to_update) + " WHERE ID = " + str(to_update["ID"]))
+            return True
+
+    def update_address(self, to_update):
+        with sqlite3.connect(self.db_name) as db:
+            test = db.execute("UPDATE Address SET " + self.create_update(to_update) + " WHERE ID = " + str(to_update["ID"]))
+            return True

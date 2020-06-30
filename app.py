@@ -78,6 +78,23 @@ def get_all_consumers():
         return jsonify({"status": "success", "result": get_consumers})
 
 
+@app.route("/customer/consumer/edit", methods=["POST"])
+def edit_consumer():
+    if is_authenticated():
+        json_body = request.json
+        print(json_body)
+        sqliteHelper.update_consumer(json_body)
+        return jsonify({"status": "success"})
+
+
+@app.route("/customer/address/edit", methods=["POST"])
+def edit_address():
+    if is_authenticated():
+        json_body = request.json
+        sqliteHelper.update_address(json_body)
+        return jsonify(status="success")
+
+
 def is_authenticated():
     api_key = open("api_key", "r").read()
     if request.headers["api_key"] == api_key:
